@@ -4,311 +4,342 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lista de Compras</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500&family=Lato:wght@300;400&family=Playfair+Display:ital,wght@0,400;1,400&family=Merriweather:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ink: #3a3330; --ink-light: #7a6e68; --paper: #faf8f4;
-  --shadow-sm: 0 2px 16px rgba(58,51,48,0.06), 0 1px 3px rgba(58,51,48,0.04);
-  --shadow-md: 0 4px 24px rgba(58,51,48,0.10), 0 2px 6px rgba(58,51,48,0.06);
-  --pending-bg: linear-gradient(135deg,#f2f7fd 0%,#f7f4f0 100%);
-  --pending-hdr: rgba(232,238,248,0.7);
+  --font-body: 'Jost', sans-serif;
+  --ink: #3a3330;
+  --ink-light: #7a6e68;
+  --paper: #faf8f4;
+  --sh-sm: 0 2px 16px rgba(58,51,48,.06),0 1px 3px rgba(58,51,48,.04);
+  --sh-md: 0 4px 24px rgba(58,51,48,.10),0 2px 6px rgba(58,51,48,.06);
+  --cat-bg: linear-gradient(135deg,#f2f7fd 0%,#f7f4f0 100%);
+  --cat-hdr: rgba(232,238,248,.7);
   --bought-bg: linear-gradient(135deg,#f5f5f3 0%,#efefed 100%);
-  --bought-hdr: rgba(240,240,238,0.7);
-  --link-bg: linear-gradient(135deg,#eef5f2 0%,#f4f7f0 100%);
-  --detail-bg: linear-gradient(135deg,#f2f7fd 0%,#f7f4f0 100%);
+  --bought-hdr: rgba(240,240,238,.7);
 }
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
 body{
-  background:var(--paper);font-family:'Jost',sans-serif;font-weight:300;
+  background:var(--paper);font-family:var(--font-body);font-weight:300;
   color:var(--ink);min-height:100vh;padding:40px 20px 80px;
-  background-image:
-    radial-gradient(ellipse at 10% 10%,rgba(242,230,216,0.4) 0%,transparent 50%),
-    radial-gradient(ellipse at 90% 80%,rgba(232,238,248,0.35) 0%,transparent 50%),
-    radial-gradient(ellipse at 50% 50%,rgba(245,232,245,0.2) 0%,transparent 60%);
+  transition:font-size .2s,color .2s;
+  background-image:radial-gradient(ellipse at 10% 10%,rgba(242,230,216,.4) 0%,transparent 50%),
+    radial-gradient(ellipse at 90% 80%,rgba(232,238,248,.35) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%,rgba(245,232,245,.2) 0%,transparent 60%);
 }
-.page{max-width:680px;margin:0 auto;}
-.view{display:block;} .view.hidden{display:none;}
+/* font sizes */
+body.fs-sm{font-size:13px} body.fs-nm{font-size:16px} body.fs-lg{font-size:18px} body.fs-xl{font-size:21px}
+
+.page{max-width:680px;margin:0 auto}
+.view{display:block} .view.hidden{display:none}
 
 /* ── HEADER ── */
-header{text-align:center;margin-bottom:48px;padding-bottom:32px;position:relative;}
-header::after{
-  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:120px;height:2px;
-  background:linear-gradient(90deg,transparent,var(--ink-light),transparent);opacity:0.4;
-}
-h1{
-  font-family:'Cormorant Garamond',serif;font-weight:300;
-  font-size:clamp(2rem,5vw,2.8rem);letter-spacing:0.04em;color:var(--ink);line-height:1.1;
-}
-h1 em{font-style:italic;color:var(--ink-light);}
-.subtitle{font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-light);margin-top:8px;}
+header{text-align:center;margin-bottom:48px;padding-bottom:32px;position:relative}
+header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:120px;height:2px;background:linear-gradient(90deg,transparent,var(--ink-light),transparent);opacity:.4}
+.header-row{display:flex;justify-content:flex-end;margin-bottom:8px}
+h1{font-family:'Cormorant Garamond',serif;font-weight:300;
+  font-size:clamp(2rem,5vw,2.8rem);letter-spacing:.04em;color:var(--ink);line-height:1.1}
+h1 em{font-style:italic;color:var(--ink-light)}
+.subtitle{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-light);margin-top:8px}
 
-/* ── ITEM WRAPPER ── */
-.items-wrapper{
-  border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm);
-  transition:box-shadow 0.3s;margin-bottom:24px;
-}
-.items-wrapper:hover{box-shadow:var(--shadow-md);}
-.items-wrapper.s-pending{background:var(--pending-bg);}
-.items-wrapper.s-bought{background:var(--bought-bg);}
-
-.group-header{
-  padding:15px 22px 13px;display:flex;align-items:center;gap:12px;
-  border-bottom:1px solid rgba(255,255,255,0.5);
-}
-.s-pending .group-header{background:var(--pending-hdr);}
-.s-bought .group-header{background:var(--bought-hdr);}
-.group-title{
-  font-family:'Cormorant Garamond',serif;font-size:1.1rem;
-  font-weight:400;letter-spacing:0.06em;flex:1;
-}
-.badge{
-  font-size:0.7rem;letter-spacing:0.12em;font-weight:500;
-  color:var(--ink-light);background:rgba(255,255,255,0.55);
-  padding:2px 9px;border-radius:20px;
-}
-.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.dot-pending{background:#7090d0;} .dot-bought{background:#a0a0a0;}
+/* ── CATEGORY GROUP ── */
+.cat-group{border-radius:18px;overflow:hidden;box-shadow:var(--sh-sm);
+  transition:box-shadow .3s;margin-bottom:20px}
+.cat-group:hover{box-shadow:var(--sh-md)}
+.cat-hdr{padding:14px 22px 12px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.5)}
+.cat-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.cat-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;
+  font-weight:400;letter-spacing:.06em;flex:1}
+.cat-badge{font-size:.68rem;letter-spacing:.12em;font-weight:500;
+  color:var(--ink-light);background:rgba(255,255,255,.55);padding:2px 9px;border-radius:20px}
+.cat-list{}
 
 /* ── ITEM ROW ── */
-.item-row{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 16px 11px 22px;
-  border-bottom:1px solid rgba(255,255,255,0.45);
-  transition:background 0.2s;position:relative;
-  animation:rowIn 0.35s ease both;
-}
-.item-row:last-child{border-bottom:none;}
-.item-row:hover{background:rgba(255,255,255,0.45);}
-.item-row:hover .item-row-actions{opacity:1;}
-.item-row.bought{opacity:0.55;}
-
-.item-check{
-  width:18px;height:18px;border-radius:50%;
-  border:1.5px solid rgba(58,51,48,0.25);flex-shrink:0;
+.item-row{display:flex;align-items:center;gap:10px;padding:11px 16px 11px 22px;
+  border-bottom:1px solid rgba(255,255,255,.45);transition:background .2s;
+  animation:rowIn .35s ease both;cursor:pointer}
+.item-row:last-child{border-bottom:none}
+.item-row:hover{background:rgba(255,255,255,.45)}
+.item-row:hover .irow-acts{opacity:1}
+.item-row.bought{opacity:.55}
+.item-check{width:18px;height:18px;border-radius:50%;
+  border:1.5px solid rgba(58,51,48,.25);flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  transition:all 0.25s;background:rgba(255,255,255,0.6);cursor:pointer;
-}
-.item-check:hover{border-color:rgba(58,51,48,0.5);background:rgba(255,255,255,0.9);}
-.item-row.bought .item-check{background:var(--ink);border-color:var(--ink);}
-.item-check svg{width:10px;height:10px;stroke:white;stroke-width:2.5;fill:none;opacity:0;transition:opacity 0.2s;}
-.item-row.bought .item-check svg{opacity:1;}
-
-.item-row-content{flex:1;min-width:0;cursor:pointer;}
-.item-row-name{font-size:0.9rem;line-height:1.5;transition:all 0.25s;}
-.item-row.bought .item-row-name{text-decoration:line-through;color:var(--ink-light);}
-.item-row-meta{font-size:0.72rem;color:var(--ink-light);margin-top:2px;font-style:italic;}
-
-.item-row-actions{
-  display:flex;align-items:center;gap:4px;
-  opacity:0;transition:opacity 0.15s;flex-shrink:0;
-}
-
-/* ── ADD ROW ── */
-.add-btn-row{
-  display:flex;justify-content:flex-end;margin-top:4px;
-  padding:0 0 4px;
-}
+  transition:all .25s;background:rgba(255,255,255,.6);cursor:pointer}
+.item-check:hover{border-color:rgba(58,51,48,.5);background:rgba(255,255,255,.9)}
+.item-row.bought .item-check{background:var(--ink);border-color:var(--ink)}
+.item-check svg{width:10px;height:10px;stroke:white;stroke-width:2.5;fill:none;opacity:0;transition:opacity .2s}
+.item-row.bought .item-check svg{opacity:1}
+.irow-body{flex:1;min-width:0}
+.irow-name{font-size:.9rem;line-height:1.5;transition:all .25s}
+.item-row.bought .irow-name{text-decoration:line-through;color:var(--ink-light)}
+.irow-meta{font-size:.72rem;color:var(--ink-light);margin-top:1px;font-style:italic}
+.irow-acts{display:flex;align-items:center;gap:4px;opacity:0;transition:opacity .15s;flex-shrink:0}
 
 /* ── BUTTONS ── */
-.btn-icon{
-  width:28px;height:28px;border-radius:50%;border:none;
-  background:rgba(255,255,255,0.7);color:var(--ink-light);
-  cursor:pointer;font-size:0.9rem;
-  display:flex;align-items:center;justify-content:center;
-  transition:background 0.15s,color 0.15s;flex-shrink:0;
-}
-.btn-icon:hover{background:#fff;color:var(--ink);}
-.btn-icon.danger:hover{background:#fde8e8;color:#c04040;}
-.btn-primary{
-  background:var(--ink);color:white;border:none;border-radius:24px;
-  padding:9px 22px;font-family:'Jost',sans-serif;font-size:0.8rem;
-  font-weight:400;letter-spacing:0.1em;cursor:pointer;transition:opacity 0.15s;
-}
-.btn-primary:hover{opacity:0.82;}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
-.btn-secondary{
-  background:transparent;color:var(--ink-light);
-  border:1px solid rgba(58,51,48,0.22);border-radius:24px;
-  padding:9px 22px;font-family:'Jost',sans-serif;font-size:0.8rem;
-  font-weight:400;letter-spacing:0.1em;cursor:pointer;transition:all 0.15s;
-}
-.btn-secondary:hover{border-color:var(--ink);color:var(--ink);}
+.btn-icon{width:28px;height:28px;border-radius:50%;border:none;
+  background:rgba(255,255,255,.7);color:var(--ink-light);
+  cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;
+  transition:background .15s,color .15s;flex-shrink:0;line-height:1}
+.btn-icon:hover{background:#fff;color:var(--ink)}
+.btn-icon.danger:hover{background:#fde8e8;color:#c04040}
+.btn-icon.ok:hover{background:#e4f0e4;color:#3a7a3a}
+.btn-primary{background:var(--ink);color:white;border:none;border-radius:24px;
+  padding:9px 22px;font-family:var(--font-body);font-size:.8rem;
+  font-weight:400;letter-spacing:.1em;cursor:pointer;transition:opacity .15s}
+.btn-primary:hover{opacity:.82}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-secondary{background:transparent;color:var(--ink-light);
+  border:1px solid rgba(58,51,48,.22);border-radius:24px;
+  padding:9px 22px;font-family:var(--font-body);font-size:.8rem;
+  font-weight:400;letter-spacing:.1em;cursor:pointer;transition:all .15s}
+.btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
+.btn-gear{background:none;border:none;cursor:pointer;
+  color:var(--ink-light);font-size:1.15rem;padding:5px 8px;border-radius:10px;
+  transition:color .15s,background .15s;line-height:1}
+.btn-gear:hover{color:var(--ink);background:rgba(255,255,255,.8)}
 
-/* ── STATES ── */
-.loading-msg,.empty-msg,.error-msg{
-  text-align:center;padding:36px 20px;
-  color:var(--ink-light);font-style:italic;font-size:0.88rem;
-}
-.error-msg{color:#c04040;}
-.spinner{
-  display:inline-block;width:20px;height:20px;
-  border:2px solid rgba(58,51,48,0.15);border-top-color:var(--ink-light);
-  border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:8px;
-}
-
-/* ── BACK BUTTON ── */
-.back-btn{
-  display:inline-flex;align-items:center;gap:6px;
+/* ── BACK ── */
+.back-btn{display:inline-flex;align-items:center;gap:6px;
   background:none;border:none;color:var(--ink-light);
-  font-family:'Jost',sans-serif;font-size:0.8rem;letter-spacing:0.1em;
+  font-family:var(--font-body);font-size:.8rem;letter-spacing:.1em;
   cursor:pointer;margin-bottom:32px;padding:6px 14px 6px 10px;
-  border-radius:20px;transition:background 0.15s,color 0.15s;
-}
-.back-btn:hover{background:rgba(255,255,255,0.8);color:var(--ink);}
+  border-radius:20px;transition:background .15s,color .15s}
+.back-btn:hover{background:rgba(255,255,255,.8);color:var(--ink)}
 
 /* ── DETAIL CARD ── */
-.detail-card{
-  background:var(--detail-bg);border-radius:18px;
-  padding:24px 28px 22px;box-shadow:var(--shadow-sm);
-  margin-bottom:32px;position:relative;
-  animation:rowIn 0.4s ease both;
-}
-.detail-item-name{
-  font-family:'Cormorant Garamond',serif;font-size:1.5rem;
-  font-weight:400;letter-spacing:0.04em;line-height:1.2;
-  padding-right:72px;
-}
-.detail-item-name.bought{text-decoration:line-through;color:var(--ink-light);}
-.detail-meta{
-  display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;
-  font-size:0.78rem;color:var(--ink-light);
-}
-.detail-meta-tag{
-  background:rgba(255,255,255,0.6);border-radius:12px;
-  padding:3px 10px;display:flex;align-items:center;gap:5px;
-}
-.detail-notas{
-  margin-top:14px;padding-top:14px;
-  border-top:1px solid rgba(58,51,48,0.09);
-  font-size:0.84rem;color:var(--ink-light);font-style:italic;line-height:1.7;
-}
-.detail-card-actions{position:absolute;top:18px;right:18px;display:flex;gap:6px;}
+.detail-card{background:linear-gradient(135deg,#f2f7fd 0%,#f7f4f0 100%);
+  border-radius:18px;padding:22px 26px;box-shadow:var(--sh-sm);
+  margin-bottom:28px;position:relative;animation:rowIn .4s ease both}
+.detail-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:.78rem;color:var(--ink-light)}
+.detail-tag{background:rgba(255,255,255,.65);border-radius:12px;padding:3px 10px;
+  display:flex;align-items:center;gap:5px}
+.detail-notas{margin-top:12px;padding-top:12px;
+  border-top:1px solid rgba(58,51,48,.09);
+  font-size:.84rem;color:var(--ink-light);font-style:italic;line-height:1.7}
+.dc-acts{position:absolute;top:16px;right:16px;display:flex;gap:6px}
+.mark-bought-btn{margin-top:14px;display:inline-flex;align-items:center;gap:7px;
+  background:var(--ink);color:white;border:none;border-radius:20px;
+  padding:8px 18px;font-family:var(--font-body);font-size:.78rem;
+  letter-spacing:.1em;cursor:pointer;transition:opacity .15s}
+.mark-bought-btn:hover{opacity:.8}
+.mark-bought-btn.undo{background:none;border:1px solid rgba(58,51,48,.22);
+  color:var(--ink-light)}
+.mark-bought-btn.undo:hover{border-color:var(--ink);color:var(--ink)}
 
 /* ── SECTION LABEL ── */
-.section-label{
-  font-family:'Cormorant Garamond',serif;font-size:1.2rem;
-  font-weight:400;letter-spacing:0.06em;margin-bottom:14px;
-  display:flex;align-items:center;gap:10px;
-}
+.section-lbl{font-family:'Cormorant Garamond',serif;font-size:1.15rem;
+  font-weight:400;letter-spacing:.06em;margin-bottom:12px;
+  display:flex;align-items:center;gap:10px}
 
 /* ── LINK CARD ── */
-.links-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
-.link-card{
-  background:var(--link-bg);border-radius:14px;
-  padding:14px 18px;box-shadow:var(--shadow-sm);
-  position:relative;transition:box-shadow 0.2s;
-  animation:rowIn 0.35s ease both;
-}
-.link-card:hover{box-shadow:var(--shadow-md);}
-.link-card:hover .link-card-actions{opacity:1;}
-.link-card-actions{
-  position:absolute;top:10px;right:10px;
-  display:flex;gap:4px;opacity:0;transition:opacity 0.15s;
-}
-.link-card-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:6px;}
-.link-loja{
-  font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;
-  color:var(--ink-light);font-weight:500;
-}
-.link-modelo{font-size:0.88rem;font-weight:400;color:var(--ink);}
-.link-valor{
-  font-family:'Cormorant Garamond',serif;font-size:1.05rem;
-  color:var(--ink);font-style:italic;margin-left:auto;
-}
-.link-url{
-  display:inline-flex;align-items:center;gap:4px;
-  font-size:0.76rem;color:var(--ink-light);text-decoration:none;
-  border-bottom:1px solid rgba(58,51,48,0.15);
-  transition:color 0.15s,border-color 0.15s;word-break:break-all;
-}
-.link-url:hover{color:var(--ink);border-color:var(--ink);}
-.link-descricao{
-  font-size:0.78rem;color:var(--ink-light);font-style:italic;
-  margin-top:7px;line-height:1.6;
-}
+.links-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.link-card{background:linear-gradient(135deg,#eef5f2 0%,#f4f7f0 100%);
+  border-radius:14px;padding:14px 18px;box-shadow:var(--sh-sm);
+  position:relative;transition:box-shadow .2s;animation:rowIn .35s ease both}
+.link-card:hover{box-shadow:var(--sh-md)}
+.link-card:hover .lc-acts{opacity:1}
+.lc-acts{position:absolute;top:10px;right:10px;
+  display:flex;gap:4px;opacity:0;transition:opacity .15s}
+.lc-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:5px}
+.lc-loja{font-size:.67rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-light);font-weight:500}
+.lc-modelo{font-size:.88rem;color:var(--ink)}
+.lc-valor{font-family:'Cormorant Garamond',serif;font-size:1.05rem;
+  color:var(--ink);font-style:italic;margin-left:auto}
+.lc-url{display:inline-flex;align-items:center;gap:4px;
+  font-size:.76rem;color:var(--ink-light);text-decoration:none;
+  border-bottom:1px solid rgba(58,51,48,.15);transition:color .15s,border-color .15s;word-break:break-all}
+.lc-url:hover{color:var(--ink);border-color:var(--ink)}
+.lc-desc{font-size:.77rem;color:var(--ink-light);font-style:italic;margin-top:6px;line-height:1.6}
+
+/* ── STATES ── */
+.loading-msg,.empty-msg,.error-msg{text-align:center;padding:32px 20px;
+  color:var(--ink-light);font-style:italic;font-size:.88rem}
+.error-msg{color:#c04040}
+.spinner{display:inline-block;width:18px;height:18px;
+  border:2px solid rgba(58,51,48,.15);border-top-color:var(--ink-light);
+  border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+
+/* ── ADD ROW ── */
+.add-row{display:flex;justify-content:flex-end;margin-top:4px}
 
 /* ── MODAL ── */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(58,51,48,0.3);
+.modal-overlay{position:fixed;inset:0;background:rgba(58,51,48,.3);
   backdrop-filter:blur(5px);z-index:100;
-  display:flex;align-items:center;justify-content:center;padding:20px;
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.hidden{display:none}
+.modal-box{background:var(--paper);border-radius:20px;padding:28px 24px;
+  width:100%;max-width:460px;box-shadow:0 20px 60px rgba(58,51,48,.18);
+  animation:modalIn .25s ease;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;
+  font-weight:400;letter-spacing:.04em;margin-bottom:20px}
+.form-field{margin-bottom:14px}
+.form-label{display:block;font-size:.68rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-light);margin-bottom:5px}
+.req{color:#c04040;margin-left:2px}
+.form-input,.form-select,.form-textarea{
+  width:100%;border:1px solid rgba(58,51,48,.18);border-radius:10px;
+  padding:9px 13px;font-family:var(--font-body);font-size:.86rem;
+  font-weight:300;color:var(--ink);background:rgba(255,255,255,.7);
+  outline:none;transition:border-color .15s,box-shadow .15s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:rgba(58,51,48,.45);box-shadow:0 0 0 3px rgba(58,51,48,.07)}
+.form-input.err{border-color:#c04040}
+.form-textarea{resize:vertical;min-height:72px;line-height:1.6}
+.form-select{appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6e68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.check-row{display:flex;align-items:center;gap:9px;cursor:pointer}
+.check-row input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--ink)}
+.check-label{font-size:.85rem;color:var(--ink-light)}
+.field-err{font-size:.7rem;color:#c04040;margin-top:3px;display:none}
+.field-err.show{display:block}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* ── SETTINGS PANEL ── */
+.settings-panel{
+  position:fixed;top:0;right:0;bottom:0;width:320px;max-width:90vw;
+  background:var(--paper);box-shadow:-6px 0 40px rgba(58,51,48,.14);
+  z-index:200;transform:translateX(100%);transition:transform .3s cubic-bezier(.25,.8,.25,1);
+  display:flex;flex-direction:column;overflow:hidden;
+  border-left:1px solid rgba(58,51,48,.08)
 }
-.modal-overlay.hidden{display:none;}
-.modal-box{
-  background:var(--paper);border-radius:20px;padding:30px 26px;
-  width:100%;max-width:460px;
-  box-shadow:0 20px 60px rgba(58,51,48,0.18);
-  animation:modalIn 0.25s ease;
-}
-.modal-title{
-  font-family:'Cormorant Garamond',serif;font-size:1.4rem;
-  font-weight:400;letter-spacing:0.04em;margin-bottom:22px;
-}
-.form-field{margin-bottom:16px;}
-.form-label{
-  display:block;font-size:0.7rem;letter-spacing:0.14em;
-  text-transform:uppercase;color:var(--ink-light);margin-bottom:6px;
-}
-.req{color:#c04040;margin-left:2px;}
-.form-input,.form-textarea{
-  width:100%;border:1px solid rgba(58,51,48,0.18);border-radius:10px;
-  padding:9px 13px;font-family:'Jost',sans-serif;font-size:0.86rem;
-  font-weight:300;color:var(--ink);background:rgba(255,255,255,0.7);
-  outline:none;transition:border-color 0.15s,box-shadow 0.15s;
-}
-.form-input:focus,.form-textarea:focus{
-  border-color:rgba(58,51,48,0.45);
-  box-shadow:0 0 0 3px rgba(58,51,48,0.07);
-}
-.form-input.err{border-color:#c04040;}
-.form-textarea{resize:vertical;min-height:76px;line-height:1.6;}
-.field-err{font-size:0.71rem;color:#c04040;margin-top:4px;display:none;}
-.field-err.show{display:block;}
-.check-row{display:flex;align-items:center;gap:9px;cursor:pointer;}
-.check-row input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--ink);}
-.check-label{font-size:0.85rem;color:var(--ink-light);}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:22px;}
+.settings-panel.open{transform:translateX(0)}
+.settings-scrim{position:fixed;inset:0;background:rgba(58,51,48,.18);
+  z-index:199;opacity:0;pointer-events:none;transition:opacity .3s}
+.settings-scrim.open{opacity:1;pointer-events:auto}
+.sp-head{padding:20px 20px 14px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(58,51,48,.08);flex-shrink:0}
+.sp-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;
+  font-weight:400;letter-spacing:.05em}
+.sp-body{flex:1;overflow-y:auto;padding:18px 20px}
+.sp-section{margin-bottom:26px}
+.sp-section-title{font-size:.67rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-light);margin-bottom:12px;font-weight:500;
+  padding-bottom:6px;border-bottom:1px solid rgba(58,51,48,.08)}
+.sp-row{display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin-bottom:10px}
+.sp-label{font-size:.82rem;color:var(--ink);flex:1}
+.sp-control{flex-shrink:0}
+.font-size-btns{display:flex;gap:4px}
+.fsz-btn{width:30px;height:30px;border-radius:8px;border:1px solid rgba(58,51,48,.18);
+  background:transparent;cursor:pointer;font-family:var(--font-body);
+  color:var(--ink-light);transition:all .15s;display:flex;align-items:center;justify-content:center}
+.fsz-btn.active{background:var(--ink);color:white;border-color:var(--ink)}
+.fsz-btn:hover:not(.active){background:rgba(255,255,255,.9);color:var(--ink)}
+.color-input{width:36px;height:30px;border:1px solid rgba(58,51,48,.18);
+  border-radius:8px;padding:2px;cursor:pointer;background:none;outline:none}
+.font-select{border:1px solid rgba(58,51,48,.18);border-radius:8px;
+  padding:5px 26px 5px 10px;font-size:.82rem;color:var(--ink);background:rgba(255,255,255,.7);
+  outline:none;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a6e68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center}
+
+/* category list in settings */
+.cat-settings-list{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.cat-settings-row{display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.6);
+  animation:rowIn .25s ease both}
+.cat-swatch{width:22px;height:22px;border-radius:6px;flex-shrink:0;border:1px solid rgba(0,0,0,.08)}
+.cat-sname{flex:1;font-size:.84rem;color:var(--ink)}
 
 /* ── TOAST ── */
-#toast-container{
-  position:fixed;bottom:22px;right:22px;z-index:200;
-  display:flex;flex-direction:column;gap:7px;pointer-events:none;
-}
-.toast{
-  background:var(--ink);color:white;border-radius:10px;
-  padding:9px 16px;font-size:0.8rem;font-weight:300;letter-spacing:0.06em;
-  box-shadow:0 4px 16px rgba(58,51,48,0.22);animation:rowIn 0.25s ease;
-}
-.toast.ok{background:#4a7a4a;} .toast.err{background:#b03030;}
+#toast-c{position:fixed;bottom:22px;right:22px;z-index:300;
+  display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:var(--ink);color:white;border-radius:10px;
+  padding:9px 16px;font-size:.8rem;font-weight:300;letter-spacing:.06em;
+  box-shadow:0 4px 16px rgba(58,51,48,.22);animation:rowIn .25s ease}
+.toast.ok{background:#3a7a3a} .toast.err{background:#b03030}
 
-footer{
-  text-align:center;margin-top:52px;font-size:0.7rem;
-  letter-spacing:0.1em;color:var(--ink-light);opacity:0.55;font-style:italic;
-}
+footer{text-align:center;margin-top:52px;font-size:.7rem;
+  letter-spacing:.1em;color:var(--ink-light);opacity:.55;font-style:italic}
 
 /* ── ANIMATIONS ── */
-@keyframes rowIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-@keyframes spin{to{transform:rotate(360deg);}}
-@keyframes modalIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes modalIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
-<body>
-<div id="toast-container"></div>
+<body class="fs-nm">
 
-<!-- ═══════════════════════════ LIST VIEW ═══════════════════════════ -->
+<div id="toast-c"></div>
+
+<!-- ── SETTINGS SCRIM ── -->
+<div class="settings-scrim" id="settings-scrim"></div>
+
+<!-- ══════════════════════ SETTINGS PANEL ════════════════════════ -->
+<div class="settings-panel" id="settings-panel">
+  <div class="sp-head">
+    <div class="sp-title">Personalizar</div>
+    <button class="btn-icon" id="sp-close" title="Fechar">✕</button>
+  </div>
+  <div class="sp-body">
+
+    <!-- TIPOGRAFIA -->
+    <div class="sp-section">
+      <div class="sp-section-title">Tipografia</div>
+      <div class="sp-row">
+        <span class="sp-label">Fonte</span>
+        <div class="sp-control">
+          <select class="font-select" id="sp-font-family">
+            <option value="Jost">Jost</option>
+            <option value="Lato">Lato</option>
+            <option value="Merriweather">Merriweather</option>
+            <option value="Playfair Display">Playfair Display</option>
+            <option value="Cormorant Garamond">Cormorant Garamond</option>
+            <option value="Georgia">Georgia</option>
+          </select>
+        </div>
+      </div>
+      <div class="sp-row">
+        <span class="sp-label">Tamanho</span>
+        <div class="font-size-btns sp-control">
+          <button class="fsz-btn" data-fs="fs-sm" title="Pequeno">A<sup style="font-size:.5em">−</sup></button>
+          <button class="fsz-btn active" data-fs="fs-nm" title="Normal">A</button>
+          <button class="fsz-btn" data-fs="fs-lg" title="Grande">A<sup style="font-size:.6em">+</sup></button>
+          <button class="fsz-btn" data-fs="fs-xl" title="Muito grande">A<sup style="font-size:.7em">++</sup></button>
+        </div>
+      </div>
+      <div class="sp-row">
+        <span class="sp-label">Cor do texto</span>
+        <input type="color" class="color-input sp-control" id="sp-font-color" value="#3a3330">
+      </div>
+    </div>
+
+    <!-- CATEGORIAS -->
+    <div class="sp-section">
+      <div class="sp-section-title">Categorias</div>
+      <div class="cat-settings-list" id="cat-settings-list">
+        <div class="loading-msg" style="padding:10px 0;font-size:.8rem">
+          <span class="spinner"></span>
+        </div>
+      </div>
+      <button class="btn-primary" id="btn-new-cat" style="width:100%;justify-content:center">+ Nova Categoria</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════ LIST VIEW ════════════════════════════ -->
 <div id="view-list" class="view">
   <div class="page">
     <header>
+      <div class="header-row">
+        <button class="btn-gear" id="btn-open-settings" title="Personalizar">⚙</button>
+      </div>
       <p class="subtitle" id="list-subtitle">Lista de Compras</p>
       <h1>Lista de <em>Compras</em></h1>
     </header>
     <div id="items-area"></div>
-    <footer>passe o mouse sobre um item para opções &nbsp;·&nbsp; clique no nome para ver os links</footer>
+    <footer>passe o mouse sobre um item para opções &nbsp;·&nbsp; clique no nome para ver detalhes</footer>
   </div>
 </div>
 
-<!-- ═══════════════════════════ DETAIL VIEW ═════════════════════════ -->
+<!-- ══════════════════════ DETAIL VIEW ══════════════════════════ -->
 <div id="view-detail" class="view hidden">
   <div class="page">
     <button class="back-btn" id="btn-back">← voltar à lista</button>
@@ -317,7 +348,7 @@ footer{
   </div>
 </div>
 
-<!-- ═══════════════════════════ MODAL: ITEM ══════════════════════════ -->
+<!-- ══════════════════════ MODAL: ITEM ══════════════════════════ -->
 <div class="modal-overlay hidden" id="modal-item">
   <div class="modal-box">
     <div class="modal-title" id="mi-title">Novo Item</div>
@@ -332,12 +363,18 @@ footer{
       <div class="field-err" id="fe-qtd">Informe uma quantidade válida (mínimo 1).</div>
     </div>
     <div class="form-field">
+      <label class="form-label">Categoria</label>
+      <select class="form-select" id="fi-cat">
+        <option value="">— sem categoria —</option>
+      </select>
+    </div>
+    <div class="form-field">
       <label class="form-label">Valor Estimado (R$)</label>
       <input class="form-input" id="fi-valor" type="number" step="0.01" min="0" placeholder="0,00">
     </div>
     <div class="form-field">
       <label class="form-label">Notas</label>
-      <textarea class="form-textarea" id="fi-notas" placeholder="Observações, detalhes, especificações…" maxlength="1000"></textarea>
+      <textarea class="form-textarea" id="fi-notas" placeholder="Observações, detalhes…" maxlength="1000"></textarea>
     </div>
     <div class="form-field">
       <label class="check-row">
@@ -352,7 +389,7 @@ footer{
   </div>
 </div>
 
-<!-- ═══════════════════════════ MODAL: LINK ══════════════════════════ -->
+<!-- ══════════════════════ MODAL: LINK ══════════════════════════ -->
 <div class="modal-overlay hidden" id="modal-link">
   <div class="modal-box">
     <div class="modal-title" id="ml-title">Novo Link</div>
@@ -363,7 +400,7 @@ footer{
     </div>
     <div class="form-field">
       <label class="form-label">Loja <span class="req">*</span></label>
-      <input class="form-input" id="fl-loja" type="text" maxlength="100" placeholder="ex: Amazon, Mercado Livre, Shopee…">
+      <input class="form-input" id="fl-loja" type="text" maxlength="100" placeholder="ex: Amazon, Mercado Livre…">
       <div class="field-err" id="fe-loja">Campo obrigatório.</div>
     </div>
     <div class="form-field">
@@ -376,7 +413,7 @@ footer{
     </div>
     <div class="form-field">
       <label class="form-label">Descrição</label>
-      <textarea class="form-textarea" id="fl-desc" placeholder="Observações sobre este link…" maxlength="500"></textarea>
+      <textarea class="form-textarea" id="fl-desc" maxlength="500" placeholder="Observações sobre este link…"></textarea>
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" id="ml-cancel">Cancelar</button>
@@ -385,21 +422,47 @@ footer{
   </div>
 </div>
 
+<!-- ══════════════════════ MODAL: CATEGORIA ═════════════════════ -->
+<div class="modal-overlay hidden" id="modal-cat">
+  <div class="modal-box" style="max-width:360px">
+    <div class="modal-title" id="mc-title">Nova Categoria</div>
+    <div class="form-field">
+      <label class="form-label">Nome <span class="req">*</span></label>
+      <input class="form-input" id="fc-nome" type="text" maxlength="80" placeholder="ex: Eletrônicos, Roupas…">
+      <div class="field-err" id="fe-cnom">Campo obrigatório.</div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Cor de destaque</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <input type="color" class="color-input" id="fc-cor" value="#7090d0" style="width:48px;height:36px">
+        <span style="font-size:.78rem;color:var(--ink-light);font-style:italic">Cor usada no cabeçalho da categoria</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="mc-cancel">Cancelar</button>
+      <button class="btn-primary" id="mc-save">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════════
 const SB_URL = 'https://cfyqkkpharbibkutatup.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmeXFra3BoYXJiaWJrdXRhdHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MDg1OTMsImV4cCI6MjA5NTM4NDU5M30.gVwCSgqw3vUrs3O-45qY0V9n4GL6daS6fwngpiQxCkw';
 const H = {
-  'apikey': SB_KEY,
-  'Authorization': 'Bearer ' + SB_KEY,
-  'Content-Type': 'application/json',
-  'Prefer': 'return=representation'
+  'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+  'Content-Type': 'application/json', 'Prefer': 'return=representation'
 };
 
-// ── API HELPERS ───────────────────────────────────────────────────────────────
-async function req(method, table, qs, body) {
+// ══════════════════════════════════════════════════════════════════
+// API HELPERS
+// ══════════════════════════════════════════════════════════════════
+async function req(method, table, qs, body, extraHeaders) {
   const url = `${SB_URL}/rest/v1/${table}${qs ? '?' + qs : ''}`;
-  const opts = { method, headers: { ...H } };
+  const headers = { ...H, ...(extraHeaders || {}) };
+  const opts = { method, headers };
   if (body !== undefined) opts.body = JSON.stringify(body);
   const res = await fetch(url, opts);
   if (!res.ok) throw new Error((await res.json().catch(() => ({ message: res.statusText }))).message);
@@ -409,68 +472,209 @@ async function req(method, table, qs, body) {
 
 const db = {
   itens: {
-    list:   ()     => req('GET',    'itens', 'select=*&order=created_at.asc'),
-    get:    id     => req('GET',    'itens', `select=*&id=eq.${id}`).then(r => r[0]),
-    create: data   => req('POST',   'itens', null, data).then(r => r[0]),
-    update: (id,d) => req('PATCH',  'itens', `id=eq.${id}`, d).then(r => r[0]),
-    remove: id     => req('DELETE', 'itens', `id=eq.${id}`),
+    list:   ()    => req('GET','itens','select=*,categorias(id,nome,cor)&order=created_at.asc'),
+    get:    id    => req('GET','itens',`select=*,categorias(id,nome,cor)&id=eq.${id}`).then(r=>r[0]),
+    create: d     => req('POST','itens',null,d).then(r=>r[0]),
+    update: (id,d)=> req('PATCH','itens',`id=eq.${id}`,d).then(r=>r[0]),
+    remove: id    => req('DELETE','itens',`id=eq.${id}`),
   },
   links: {
-    list:   iid    => req('GET',    'links', `select=*&item_id=eq.${iid}&order=created_at.asc`),
-    create: data   => req('POST',   'links', null, data).then(r => r[0]),
-    update: (id,d) => req('PATCH',  'links', `id=eq.${id}`, d).then(r => r[0]),
-    remove: id     => req('DELETE', 'links', `id=eq.${id}`),
+    list:   iid   => req('GET','links',`select=*&item_id=eq.${iid}&order=created_at.asc`),
+    create: d     => req('POST','links',null,d).then(r=>r[0]),
+    update: (id,d)=> req('PATCH','links',`id=eq.${id}`,d).then(r=>r[0]),
+    remove: id    => req('DELETE','links',`id=eq.${id}`),
+  },
+  categorias: {
+    list:   ()    => req('GET','categorias','select=*&order=nome.asc'),
+    create: d     => req('POST','categorias',null,d).then(r=>r[0]),
+    update: (id,d)=> req('PATCH','categorias',`id=eq.${id}`,d).then(r=>r[0]),
+    remove: id    => req('DELETE','categorias',`id=eq.${id}`),
+  },
+  config: {
+    list:   ()    => req('GET','configuracoes','select=chave,valor'),
+    upsert: (chave,valor) => req('POST','configuracoes',`on_conflict=chave`,{chave,valor},{Prefer:'resolution=merge-duplicates,return=representation'}),
   }
 };
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
 let currentItemId = null;
+let cats = []; // loaded categories
 let iModalMode = 'create', iEditId = null;
 let lModalMode = 'create', lEditId = null;
+let cModalMode = 'create', cEditId = null;
 
-// ── TOAST ─────────────────────────────────────────────────────────────────────
-function toast(msg, type = '') {
-  const el = document.createElement('div');
-  el.className = 'toast' + (type ? ' ' + type : '');
-  el.textContent = msg;
-  const c = document.getElementById('toast-container');
-  c.appendChild(el);
-  setTimeout(() => {
-    el.style.transition = 'opacity 0.3s,transform 0.3s';
-    el.style.opacity = '0'; el.style.transform = 'translateY(6px)';
-    setTimeout(() => el.remove(), 320);
-  }, 2800);
-}
-
-// ── ESCAPE HTML ───────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════
 function esc(s) {
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function fmtBRL(v) { return 'R$\u00a0' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
+function fmtBRL(v) { return 'R$\u00a0' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2}); }
+function toast(msg, type='') {
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ' '+type : '');
+  el.textContent = msg;
+  const c = document.getElementById('toast-c');
+  c.appendChild(el);
+  setTimeout(()=>{
+    el.style.transition='opacity .3s,transform .3s';el.style.opacity='0';el.style.transform='translateY(6px)';
+    setTimeout(()=>el.remove(), 320);
+  }, 2800);
+}
 
-// ── ROUTING ───────────────────────────────────────────────────────────────────
-function goList()   { location.hash = '';           renderList(); }
+// Hex → rgba string e.g. "rgba(112,144,208,0.18)"
+function hexToRgba(hex, a) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════════════════════════
+const FONT_MAP = {
+  'Jost':                "'Jost', sans-serif",
+  'Lato':                "'Lato', sans-serif",
+  'Merriweather':        "'Merriweather', serif",
+  'Playfair Display':    "'Playfair Display', serif",
+  'Cormorant Garamond':  "'Cormorant Garamond', serif",
+  'Georgia':             "Georgia, serif",
+};
+let appSettings = { fonte_familia:'Jost', fonte_tamanho:'fs-nm', fonte_cor:'#3a3330' };
+
+async function loadSettings() {
+  try {
+    const rows = await db.config.list();
+    rows.forEach(r => { appSettings[r.chave] = r.valor; });
+  } catch(e) { /* use defaults */ }
+  applySettings();
+}
+
+function applySettings() {
+  const fontFamily = FONT_MAP[appSettings.fonte_familia] || FONT_MAP['Jost'];
+  document.documentElement.style.setProperty('--font-body', fontFamily);
+
+  const col = appSettings.fonte_cor || '#3a3330';
+  document.documentElement.style.setProperty('--ink', col);
+  // derive ink-light (same hue, more transparent)
+  const r = parseInt(col.slice(1,3),16), g = parseInt(col.slice(3,5),16), b = parseInt(col.slice(5,7),16);
+  document.documentElement.style.setProperty('--ink-light', `rgba(${r},${g},${b},0.52)`);
+
+  const sz = appSettings.fonte_tamanho || 'fs-nm';
+  document.body.className = sz;
+
+  // Sync settings panel UI
+  const fam = document.getElementById('sp-font-family');
+  if (fam) fam.value = appSettings.fonte_familia || 'Jost';
+  const col2 = document.getElementById('sp-font-color');
+  if (col2) col2.value = col;
+  document.querySelectorAll('.fsz-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.fs === sz);
+  });
+}
+
+async function saveSetting(chave, valor) {
+  appSettings[chave] = valor;
+  applySettings();
+  try { await db.config.upsert(chave, valor); }
+  catch(e) { toast('Erro ao salvar configuração: ' + e.message, 'err'); }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SETTINGS PANEL UI
+// ══════════════════════════════════════════════════════════════════
+function openSettings() {
+  document.getElementById('settings-panel').classList.add('open');
+  document.getElementById('settings-scrim').classList.add('open');
+  renderCatSettings();
+}
+function closeSettings() {
+  document.getElementById('settings-panel').classList.remove('open');
+  document.getElementById('settings-scrim').classList.remove('open');
+}
+
+async function renderCatSettings() {
+  const list = document.getElementById('cat-settings-list');
+  list.innerHTML = '<div class="loading-msg" style="padding:8px 0;font-size:.8rem"><span class="spinner"></span></div>';
+  try {
+    cats = await db.categorias.list();
+    list.innerHTML = '';
+    if (!cats.length) {
+      list.innerHTML = '<div style="font-size:.78rem;color:var(--ink-light);font-style:italic;padding:4px 0">Nenhuma categoria ainda.</div>';
+      return;
+    }
+    cats.forEach((cat,i) => {
+      const row = document.createElement('div');
+      row.className = 'cat-settings-row';
+      row.style.animationDelay = (i * 0.04) + 's';
+      row.innerHTML = `
+        <div class="cat-swatch" style="background:${esc(cat.cor)}"></div>
+        <span class="cat-sname">${esc(cat.nome)}</span>
+        <button class="btn-icon" data-edit="${cat.id}" title="Editar">✎</button>
+        <button class="btn-icon danger" data-del="${cat.id}" title="Remover">✕</button>
+      `;
+      row.querySelector('[data-edit]').addEventListener('click', () => openCatModal('edit', cat));
+      row.querySelector('[data-del]').addEventListener('click', async () => {
+        if (!confirm(`Remover a categoria "${cat.nome}"? Os itens vinculados ficarão sem categoria.`)) return;
+        try { await db.categorias.remove(cat.id); toast('Categoria removida.','ok'); renderCatSettings(); }
+        catch(e) { toast('Erro: '+e.message,'err'); }
+      });
+      list.appendChild(row);
+    });
+  } catch(e) {
+    list.innerHTML = `<div class="error-msg" style="padding:8px 0">Erro: ${esc(e.message)}</div>`;
+  }
+}
+
+// Settings panel events
+document.getElementById('btn-open-settings').addEventListener('click', openSettings);
+document.getElementById('sp-close').addEventListener('click', closeSettings);
+document.getElementById('settings-scrim').addEventListener('click', closeSettings);
+
+document.getElementById('sp-font-family').addEventListener('change', e => {
+  saveSetting('fonte_familia', e.target.value);
+});
+let colorDebounce;
+document.getElementById('sp-font-color').addEventListener('input', e => {
+  clearTimeout(colorDebounce);
+  colorDebounce = setTimeout(() => saveSetting('fonte_cor', e.target.value), 400);
+});
+document.querySelectorAll('.fsz-btn').forEach(btn => {
+  btn.addEventListener('click', () => saveSetting('fonte_tamanho', btn.dataset.fs));
+});
+document.getElementById('btn-new-cat').addEventListener('click', () => openCatModal('create'));
+
+// ══════════════════════════════════════════════════════════════════
+// ROUTING
+// ══════════════════════════════════════════════════════════════════
+function goList()     { location.hash = ''; renderList(); }
 function goDetail(id) { location.hash = 'item/' + id; renderDetail(id); }
 
 function handleRoute() {
   const h = location.hash.replace('#','');
-  document.getElementById('view-list').classList.toggle('hidden', h.startsWith('item/'));
-  document.getElementById('view-detail').classList.toggle('hidden', !h.startsWith('item/'));
-  if (h.startsWith('item/')) {
+  const isDetail = h.startsWith('item/');
+  document.getElementById('view-list').classList.toggle('hidden', isDetail);
+  document.getElementById('view-detail').classList.toggle('hidden', !isDetail);
+  if (isDetail) {
     const id = parseInt(h.replace('item/',''));
     if (!isNaN(id)) { currentItemId = id; renderDetail(id); }
-  } else {
-    currentItemId = null; renderList();
-  }
+  } else { currentItemId = null; renderList(); }
 }
 window.addEventListener('popstate', handleRoute);
-document.getElementById('btn-back').addEventListener('click', () => { history.back(); });
+document.getElementById('btn-back').addEventListener('click', () => history.back());
 
-// ── LIST VIEW ─────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+// LIST VIEW
+// ══════════════════════════════════════════════════════════════════
 async function renderList() {
   const area = document.getElementById('items-area');
   area.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Carregando itens…</div>';
   try {
+    // Load categories + items in parallel
+    [cats] = await Promise.all([db.categorias.list()]);
     const items = await db.itens.list();
     area.innerHTML = '';
 
@@ -480,37 +684,79 @@ async function renderList() {
     if (!items.length) {
       area.innerHTML = '<div class="empty-msg">Nenhum item na lista ainda.<br>Adicione o primeiro!</div>';
     } else {
-      if (pending.length) buildGroup(area, pending, 'Pendentes', 'pending');
-      if (bought.length)  buildGroup(area, bought,  'Comprados', 'bought');
+      if (pending.length) {
+        // Group pending by category
+        const grouped = {};
+        const noCat   = [];
+        pending.forEach(item => {
+          if (item.categoria_id) {
+            if (!grouped[item.categoria_id]) grouped[item.categoria_id] = [];
+            grouped[item.categoria_id].push(item);
+          } else noCat.push(item);
+        });
+
+        // Render each category group
+        cats.forEach(cat => {
+          const catItems = grouped[cat.id];
+          if (catItems && catItems.length) buildCatGroup(area, catItems, cat);
+        });
+        // Items without category
+        if (noCat.length) buildCatGroup(area, noCat, null);
+      }
+      // Bought section
+      if (bought.length) {
+        const bw = document.createElement('div');
+        bw.className = 'cat-group';
+        bw.style.background = 'linear-gradient(135deg,#f5f5f3 0%,#efefed 100%)';
+        bw.innerHTML = `
+          <div class="cat-hdr" style="background:rgba(240,240,238,.7)">
+            <div class="cat-dot" style="background:#a0a0a0"></div>
+            <div class="cat-name">Comprados</div>
+            <div class="cat-badge">${bought.length} item${bought.length!==1?'s':''}</div>
+          </div>
+          <div class="cat-list" id="cat-list-bought"></div>`;
+        area.appendChild(bw);
+        bought.forEach((item,i) => {
+          const el = makeItemRow(item);
+          el.style.animationDelay = (i * 0.04) + 's';
+          bw.querySelector('.cat-list').appendChild(el);
+        });
+      }
     }
 
     const row = document.createElement('div');
-    row.className = 'add-btn-row';
+    row.className = 'add-row';
     row.innerHTML = '<button class="btn-primary" id="btn-new-item">+ Novo Item</button>';
     area.appendChild(row);
     document.getElementById('btn-new-item').addEventListener('click', () => openItemModal('create'));
 
     document.getElementById('list-subtitle').textContent =
-      'Atualizada em ' + new Date().toLocaleDateString('pt-BR', { day:'numeric', month:'long', year:'numeric' });
+      'Atualizada em ' + new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
   } catch(e) {
     area.innerHTML = `<div class="error-msg">Erro ao carregar: ${esc(e.message)}</div>`;
   }
 }
 
-function buildGroup(container, items, title, cls) {
+function buildCatGroup(container, items, cat) {
+  const cor = cat?.cor || '#a8a8a8';
+  const bg1 = hexToRgba(cor, 0.12);
+  const bg2 = hexToRgba(cor, 0.05);
+  const hdrBg = hexToRgba(cor, 0.22);
+  const label = cat ? cat.nome : 'Sem Categoria';
+
   const wrap = document.createElement('div');
-  wrap.className = `items-wrapper s-${cls}`;
+  wrap.className = 'cat-group';
+  wrap.style.background = `linear-gradient(135deg, ${bg1} 0%, ${bg2} 100%)`;
   wrap.innerHTML = `
-    <div class="group-header">
-      <div class="dot dot-${cls}"></div>
-      <div class="group-title">${title}</div>
-      <div class="badge">${items.length} item${items.length !== 1 ? 's' : ''}</div>
+    <div class="cat-hdr" style="background:${hdrBg}">
+      <div class="cat-dot" style="background:${cor}"></div>
+      <div class="cat-name">${esc(label)}</div>
+      <div class="cat-badge">${items.length} item${items.length!==1?'s':''}</div>
     </div>
-    <div class="group-list"></div>
-  `;
+    <div class="cat-list"></div>`;
   container.appendChild(wrap);
-  const list = wrap.querySelector('.group-list');
-  items.forEach((item, i) => {
+  const list = wrap.querySelector('.cat-list');
+  items.forEach((item,i) => {
     const el = makeItemRow(item);
     el.style.animationDelay = (i * 0.04) + 's';
     list.appendChild(el);
@@ -522,51 +768,45 @@ function makeItemRow(item) {
   div.className = 'item-row' + (item.comprado ? ' bought' : '');
 
   let meta = [];
-  if (item.quantidade) meta.push(item.quantidade + 'x');
+  if (item.quantidade && item.quantidade > 1) meta.push(item.quantidade + 'x');
   if (item.valor_estimado) meta.push(fmtBRL(item.valor_estimado));
-  if (item.notas) meta.push(item.notas.length > 55 ? item.notas.substring(0,55) + '…' : item.notas);
+  if (item.notas) meta.push(item.notas.length > 50 ? item.notas.substring(0,50)+'…' : item.notas);
 
   div.innerHTML = `
-    <div class="item-check" title="${item.comprado ? 'Marcar como pendente' : 'Marcar como comprado'}">
+    <div class="item-check" title="${item.comprado?'Marcar como pendente':'Marcar como comprado'}">
       <svg viewBox="0 0 12 10"><polyline points="1,5 4.5,9 11,1"/></svg>
     </div>
-    <div class="item-row-content">
-      <div class="item-row-name">${esc(item.nome)}</div>
-      ${meta.length ? `<div class="item-row-meta">${esc(meta.join(' · '))}</div>` : ''}
+    <div class="irow-body">
+      <div class="irow-name">${esc(item.nome)}</div>
+      ${meta.length ? `<div class="irow-meta">${esc(meta.join(' · '))}</div>` : ''}
     </div>
-    <div class="item-row-actions">
-      <button class="btn-icon" data-a="edit"   title="Editar">✎</button>
+    <div class="irow-acts">
+      <button class="btn-icon" data-a="edit" title="Editar">✎</button>
       <button class="btn-icon danger" data-a="del" title="Remover">✕</button>
-    </div>
-  `;
+    </div>`;
 
   div.querySelector('.item-check').addEventListener('click', async e => {
     e.stopPropagation();
     try {
       await db.itens.update(item.id, { comprado: !item.comprado });
-      toast(item.comprado ? 'Marcado como pendente.' : 'Marcado como comprado!', 'ok');
+      toast(item.comprado ? 'Marcado como pendente.' : 'Marcado como comprado! ✓', 'ok');
       renderList();
-    } catch(err) { toast('Erro: ' + err.message, 'err'); }
+    } catch(err) { toast('Erro: '+err.message,'err'); }
   });
-
-  div.querySelector('.item-row-content').addEventListener('click', () => goDetail(item.id));
-
-  div.querySelector('[data-a="edit"]').addEventListener('click', e => {
-    e.stopPropagation(); openItemModal('edit', item);
-  });
+  div.querySelector('.irow-body').addEventListener('click', () => goDetail(item.id));
+  div.querySelector('[data-a="edit"]').addEventListener('click', e => { e.stopPropagation(); openItemModal('edit', item); });
   div.querySelector('[data-a="del"]').addEventListener('click', async e => {
     e.stopPropagation();
     if (!confirm(`Remover "${item.nome}" e todos os seus links?`)) return;
-    try {
-      await db.itens.remove(item.id);
-      toast('Item removido.', 'ok'); renderList();
-    } catch(err) { toast('Erro: ' + err.message, 'err'); }
+    try { await db.itens.remove(item.id); toast('Item removido.','ok'); renderList(); }
+    catch(err) { toast('Erro: '+err.message,'err'); }
   });
-
   return div;
 }
 
-// ── DETAIL VIEW ───────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+// DETAIL VIEW
+// ══════════════════════════════════════════════════════════════════
 async function renderDetail(itemId) {
   const content = document.getElementById('detail-content');
   content.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Carregando…</div>';
@@ -574,53 +814,65 @@ async function renderDetail(itemId) {
     const [item, links] = await Promise.all([db.itens.get(itemId), db.links.list(itemId)]);
     if (!item) throw new Error('Item não encontrado.');
 
-    let tags = '';
-    if (item.quantidade)    tags += `<span class="detail-meta-tag">📦 ${esc(String(item.quantidade))}x</span>`;
-    if (item.valor_estimado) tags += `<span class="detail-meta-tag">💰 ${fmtBRL(item.valor_estimado)}</span>`;
-    if (item.comprado)       tags += `<span class="detail-meta-tag">✓ Comprado</span>`;
+    const cat = item.categorias;
+    const cor = cat?.cor || '#a8a8a8';
+    const catLabel = cat ? cat.nome : 'Sem Categoria';
+
+    let tags = `<span class="detail-tag">🏷 ${esc(catLabel)}</span>`;
+    if (item.quantidade) tags += `<span class="detail-tag">📦 ${esc(String(item.quantidade))}x</span>`;
+    if (item.valor_estimado) tags += `<span class="detail-tag">💰 ${fmtBRL(item.valor_estimado)}</span>`;
+    if (item.comprado) tags += `<span class="detail-tag" style="background:rgba(100,180,100,.18)">✓ Comprado</span>`;
 
     content.innerHTML = `
       <header style="margin-bottom:28px;padding-bottom:24px;">
         <p class="subtitle">${item.comprado ? 'Item comprado' : 'Item pendente'}</p>
-        <h1 style="${item.comprado ? 'text-decoration:line-through;color:var(--ink-light)' : ''}">${esc(item.nome)}</h1>
+        <h1 style="${item.comprado?'text-decoration:line-through;color:var(--ink-light)':''}">${esc(item.nome)}</h1>
       </header>
-
-      <div class="detail-card">
-        <div class="detail-card-actions">
-          <button class="btn-icon" id="btn-edit-item"   title="Editar item">✎</button>
+      <div class="detail-card" style="background:linear-gradient(135deg,${hexToRgba(cor,.12)} 0%,${hexToRgba(cor,.04)} 100%)">
+        <div class="dc-acts">
+          <button class="btn-icon" id="btn-edit-item" title="Editar item">✎</button>
           <button class="btn-icon danger" id="btn-del-item" title="Remover item">✕</button>
         </div>
-        ${tags ? `<div class="detail-meta">${tags}</div>` : '<div class="detail-meta"><span style="font-style:italic;opacity:0.6">sem informações adicionais</span></div>'}
+        <div class="detail-meta">${tags}</div>
         ${item.notas ? `<div class="detail-notas">${esc(item.notas)}</div>` : ''}
+        <div style="margin-top:14px">
+          <button class="mark-bought-btn ${item.comprado?'undo':''}" id="btn-toggle-bought">
+            ${item.comprado ? '↩ Marcar como pendente' : '✓ Marcar como comprado'}
+          </button>
+        </div>
       </div>
 
-      <div class="section-label">
+      <div class="section-lbl">
         Links Encontrados
-        <span class="badge">${links.length} link${links.length !== 1 ? 's' : ''}</span>
+        <span class="cat-badge">${links.length} link${links.length!==1?'s':''}</span>
       </div>
-      <div class="links-grid" id="links-grid">
-        ${links.length === 0 ? '<div class="empty-msg" style="padding:16px 0 8px">Nenhum link cadastrado ainda.</div>' : ''}
+      <div class="links-list" id="links-list">
+        ${links.length===0 ? '<div class="empty-msg" style="padding:14px 0 8px">Nenhum link cadastrado ainda.</div>' : ''}
       </div>
-      <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+      <div class="add-row">
         <button class="btn-primary" id="btn-new-link">+ Novo Link</button>
-      </div>
-    `;
+      </div>`;
 
+    document.getElementById('btn-toggle-bought').addEventListener('click', async () => {
+      try {
+        await db.itens.update(itemId, { comprado: !item.comprado });
+        toast(item.comprado ? 'Marcado como pendente.' : 'Marcado como comprado! ✓','ok');
+        renderDetail(itemId);
+      } catch(err) { toast('Erro: '+err.message,'err'); }
+    });
     document.getElementById('btn-edit-item').addEventListener('click', () => openItemModal('edit', item));
     document.getElementById('btn-del-item').addEventListener('click', async () => {
       if (!confirm(`Remover "${item.nome}" e todos os links?`)) return;
-      try {
-        await db.itens.remove(itemId);
-        toast('Item removido.', 'ok'); goList();
-      } catch(err) { toast('Erro: ' + err.message, 'err'); }
+      try { await db.itens.remove(itemId); toast('Item removido.','ok'); goList(); }
+      catch(err) { toast('Erro: '+err.message,'err'); }
     });
     document.getElementById('btn-new-link').addEventListener('click', () => openLinkModal('create'));
 
-    const grid = document.getElementById('links-grid');
-    links.forEach((lk, i) => {
+    const linkList = document.getElementById('links-list');
+    links.forEach((lk,i) => {
       const el = makeLinkCard(lk);
       el.style.animationDelay = (i * 0.05) + 's';
-      grid.appendChild(el);
+      linkList.appendChild(el);
     });
   } catch(e) {
     content.innerHTML = `<div class="error-msg">Erro: ${esc(e.message)}</div>`;
@@ -630,164 +882,211 @@ async function renderDetail(itemId) {
 function makeLinkCard(lk) {
   const div = document.createElement('div');
   div.className = 'link-card';
-
   let domain = lk.link;
   try { domain = new URL(lk.link).hostname.replace(/^www\./,''); } catch {}
 
   div.innerHTML = `
-    <div class="link-card-actions">
+    <div class="lc-acts">
       <button class="btn-icon" data-a="edit" title="Editar link">✎</button>
       <button class="btn-icon danger" data-a="del" title="Remover link">✕</button>
     </div>
-    <div class="link-card-row">
-      <span class="link-loja">${esc(lk.loja)}</span>
-      ${lk.modelo ? `<span class="link-modelo">${esc(lk.modelo)}</span>` : ''}
-      ${lk.valor  ? `<span class="link-valor">${fmtBRL(lk.valor)}</span>` : ''}
+    <div class="lc-row">
+      <span class="lc-loja">${esc(lk.loja)}</span>
+      ${lk.modelo ? `<span class="lc-modelo">${esc(lk.modelo)}</span>` : ''}
+      ${lk.valor  ? `<span class="lc-valor">${fmtBRL(lk.valor)}</span>` : ''}
     </div>
-    <a class="link-url" href="${esc(lk.link)}" target="_blank" rel="noopener noreferrer">
-      ↗ ${esc(domain)}
-    </a>
-    ${lk.descricao ? `<div class="link-descricao">${esc(lk.descricao)}</div>` : ''}
-  `;
+    <a class="lc-url" href="${esc(lk.link)}" target="_blank" rel="noopener noreferrer">↗ ${esc(domain)}</a>
+    ${lk.descricao ? `<div class="lc-desc">${esc(lk.descricao)}</div>` : ''}`;
 
   div.querySelector('[data-a="edit"]').addEventListener('click', e => { e.stopPropagation(); openLinkModal('edit', lk); });
   div.querySelector('[data-a="del"]').addEventListener('click', async e => {
     e.stopPropagation();
     if (!confirm('Remover este link?')) return;
-    try {
-      await db.links.remove(lk.id);
-      toast('Link removido.', 'ok'); renderDetail(currentItemId);
-    } catch(err) { toast('Erro: ' + err.message, 'err'); }
+    try { await db.links.remove(lk.id); toast('Link removido.','ok'); renderDetail(currentItemId); }
+    catch(err) { toast('Erro: '+err.message,'err'); }
   });
-
   return div;
 }
 
-// ── MODAL: ITEM ───────────────────────────────────────────────────────────────
-function openItemModal(mode, item) {
+// ══════════════════════════════════════════════════════════════════
+// MODAL: ITEM
+// ══════════════════════════════════════════════════════════════════
+async function openItemModal(mode, item) {
   iModalMode = mode; iEditId = item?.id ?? null;
   document.getElementById('mi-title').textContent = mode === 'create' ? 'Novo Item' : 'Editar Item';
   document.getElementById('fi-nome').value    = item?.nome ?? '';
-  document.getElementById('fi-qtd').value     = item?.quantidade ?? '';
+  document.getElementById('fi-qtd').value     = item?.quantidade ?? 1;
   document.getElementById('fi-valor').value   = item?.valor_estimado ?? '';
   document.getElementById('fi-notas').value   = item?.notas ?? '';
   document.getElementById('fi-comprado').checked = item?.comprado ?? false;
-  clearErr(['fi-nome','fi-qtd']);
+
+  // Populate category select
+  const sel = document.getElementById('fi-cat');
+  sel.innerHTML = '<option value="">— sem categoria —</option>';
+  try {
+    if (!cats.length) cats = await db.categorias.list();
+    cats.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id; opt.textContent = c.nome;
+      if (item?.categoria_id === c.id) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  } catch {}
+
+  clearFieldErr(['fi-nome','fi-qtd']);
   document.getElementById('modal-item').classList.remove('hidden');
   setTimeout(() => document.getElementById('fi-nome').focus(), 60);
 }
 function closeItemModal() { document.getElementById('modal-item').classList.add('hidden'); }
 
 async function saveItem() {
-  clearErr(['fi-nome','fi-qtd']);
+  clearFieldErr(['fi-nome','fi-qtd']);
   const nome = document.getElementById('fi-nome').value.trim();
   const qtd  = document.getElementById('fi-qtd').value;
   let valid = true;
-  if (!nome) { setErr('fi-nome','fe-nome'); valid = false; }
-  if (!qtd || parseInt(qtd) < 1) { setErr('fi-qtd','fe-qtd'); valid = false; }
+  if (!nome) { setFieldErr('fi-nome','fe-nome'); valid = false; }
+  if (!qtd || parseInt(qtd) < 1) { setFieldErr('fi-qtd','fe-qtd'); valid = false; }
   if (!valid) return;
 
+  const catVal = document.getElementById('fi-cat').value;
   const data = {
-    nome,
-    quantidade: parseInt(qtd),
+    nome, quantidade: parseInt(qtd),
+    categoria_id: catVal ? parseInt(catVal) : null,
     valor_estimado: document.getElementById('fi-valor').value || null,
     notas: document.getElementById('fi-notas').value.trim() || null,
     comprado: document.getElementById('fi-comprado').checked,
   };
-
   const btn = document.getElementById('mi-save');
   btn.disabled = true; btn.textContent = 'Salvando…';
   try {
-    if (iModalMode === 'create') { await db.itens.create(data); toast('Item adicionado!', 'ok'); }
-    else                         { await db.itens.update(iEditId, data); toast('Item atualizado!', 'ok'); }
+    if (iModalMode === 'create') { await db.itens.create(data); toast('Item adicionado!','ok'); }
+    else                         { await db.itens.update(iEditId, data); toast('Item atualizado!','ok'); }
     closeItemModal();
     if (currentItemId) renderDetail(currentItemId); else renderList();
-  } catch(e) { toast('Erro: ' + e.message, 'err'); }
+  } catch(e) { toast('Erro: '+e.message,'err'); }
   finally { btn.disabled = false; btn.textContent = 'Salvar'; }
 }
 
-// ── MODAL: LINK ───────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+// MODAL: LINK
+// ══════════════════════════════════════════════════════════════════
 function openLinkModal(mode, lk) {
   lModalMode = mode; lEditId = lk?.id ?? null;
   document.getElementById('ml-title').textContent = mode === 'create' ? 'Novo Link' : 'Editar Link';
-  document.getElementById('fl-link').value  = lk?.link  ?? '';
-  document.getElementById('fl-loja').value  = lk?.loja  ?? '';
-  document.getElementById('fl-valor').value = lk?.valor ?? '';
-  document.getElementById('fl-modelo').value= lk?.modelo ?? '';
-  document.getElementById('fl-desc').value  = lk?.descricao ?? '';
-  clearErr(['fl-link','fl-loja']);
+  document.getElementById('fl-link').value   = lk?.link  ?? '';
+  document.getElementById('fl-loja').value   = lk?.loja  ?? '';
+  document.getElementById('fl-valor').value  = lk?.valor ?? '';
+  document.getElementById('fl-modelo').value = lk?.modelo ?? '';
+  document.getElementById('fl-desc').value   = lk?.descricao ?? '';
+  clearFieldErr(['fl-link','fl-loja']);
   document.getElementById('modal-link').classList.remove('hidden');
   setTimeout(() => document.getElementById('fl-link').focus(), 60);
 }
 function closeLinkModal() { document.getElementById('modal-link').classList.add('hidden'); }
 
 async function saveLink() {
-  clearErr(['fl-link','fl-loja']);
+  clearFieldErr(['fl-link','fl-loja']);
   const link = document.getElementById('fl-link').value.trim();
   const loja = document.getElementById('fl-loja').value.trim();
   let valid = true;
-  if (!link) { setErr('fl-link','fe-link'); valid = false; }
-  if (!loja) { setErr('fl-loja','fe-loja'); valid = false; }
+  if (!link) { setFieldErr('fl-link','fe-link'); valid = false; }
+  if (!loja) { setFieldErr('fl-loja','fe-loja'); valid = false; }
   if (!valid) return;
 
   const btn = document.getElementById('ml-save');
   btn.disabled = true; btn.textContent = 'Salvando…';
   try {
+    const payload = {
+      link, loja,
+      valor:     document.getElementById('fl-valor').value  || null,
+      modelo:    document.getElementById('fl-modelo').value.trim() || null,
+      descricao: document.getElementById('fl-desc').value.trim() || null,
+    };
     if (lModalMode === 'create') {
-      await db.links.create({
-        item_id: currentItemId, link, loja,
-        valor:    document.getElementById('fl-valor').value  || null,
-        modelo:   document.getElementById('fl-modelo').value.trim() || null,
-        descricao:document.getElementById('fl-desc').value.trim()   || null,
-      });
-      toast('Link adicionado!', 'ok');
+      await db.links.create({ ...payload, item_id: currentItemId });
+      toast('Link adicionado!','ok');
     } else {
-      await db.links.update(lEditId, {
-        link, loja,
-        valor:    document.getElementById('fl-valor').value  || null,
-        modelo:   document.getElementById('fl-modelo').value.trim() || null,
-        descricao:document.getElementById('fl-desc').value.trim()   || null,
-      });
-      toast('Link atualizado!', 'ok');
+      await db.links.update(lEditId, payload);
+      toast('Link atualizado!','ok');
     }
-    closeLinkModal();
-    renderDetail(currentItemId);
-  } catch(e) { toast('Erro: ' + e.message, 'err'); }
+    closeLinkModal(); renderDetail(currentItemId);
+  } catch(e) { toast('Erro: '+e.message,'err'); }
   finally { btn.disabled = false; btn.textContent = 'Salvar'; }
 }
 
-// ── FORM HELPERS ──────────────────────────────────────────────────────────────
-function setErr(inputId, errId) {
+// ══════════════════════════════════════════════════════════════════
+// MODAL: CATEGORIA
+// ══════════════════════════════════════════════════════════════════
+function openCatModal(mode, cat) {
+  cModalMode = mode; cEditId = cat?.id ?? null;
+  document.getElementById('mc-title').textContent = mode === 'create' ? 'Nova Categoria' : 'Editar Categoria';
+  document.getElementById('fc-nome').value = cat?.nome ?? '';
+  document.getElementById('fc-cor').value  = cat?.cor ?? '#7090d0';
+  clearFieldErr(['fc-nome']);
+  document.getElementById('modal-cat').classList.remove('hidden');
+  setTimeout(() => document.getElementById('fc-nome').focus(), 60);
+}
+function closeCatModal() { document.getElementById('modal-cat').classList.add('hidden'); }
+
+async function saveCat() {
+  clearFieldErr(['fc-nome']);
+  const nome = document.getElementById('fc-nome').value.trim();
+  if (!nome) { setFieldErr('fc-nome','fe-cnom'); return; }
+  const cor = document.getElementById('fc-cor').value;
+  const btn = document.getElementById('mc-save');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  try {
+    if (cModalMode === 'create') { await db.categorias.create({ nome, cor }); toast('Categoria criada!','ok'); }
+    else                         { await db.categorias.update(cEditId, { nome, cor }); toast('Categoria atualizada!','ok'); }
+    closeCatModal();
+    cats = await db.categorias.list(); // refresh cache
+    renderCatSettings();
+  } catch(e) { toast('Erro: '+e.message,'err'); }
+  finally { btn.disabled = false; btn.textContent = 'Salvar'; }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FORM HELPERS
+// ══════════════════════════════════════════════════════════════════
+function setFieldErr(inputId, errId) {
   document.getElementById(inputId).classList.add('err');
   document.getElementById(errId).classList.add('show');
 }
-function clearErr(ids) {
+function clearFieldErr(ids) {
   ids.forEach(id => {
-    document.getElementById(id).classList.remove('err');
-    const e = document.getElementById(id.replace('fi-','fe-').replace('fl-','fe-'));
-    if (e) e.classList.remove('show');
+    document.getElementById(id)?.classList.remove('err');
+    const eid = id.replace(/^f[iflc]-/,'fe-');
+    document.getElementById(eid)?.classList.remove('show');
   });
 }
 
-// ── EVENTS ────────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+// EVENTS: MODALS
+// ══════════════════════════════════════════════════════════════════
 document.getElementById('mi-cancel').addEventListener('click', closeItemModal);
 document.getElementById('mi-save').addEventListener('click', saveItem);
+document.getElementById('modal-item').addEventListener('click', e => { if(e.target===e.currentTarget) closeItemModal(); });
+
 document.getElementById('ml-cancel').addEventListener('click', closeLinkModal);
 document.getElementById('ml-save').addEventListener('click', saveLink);
+document.getElementById('modal-link').addEventListener('click', e => { if(e.target===e.currentTarget) closeLinkModal(); });
 
-// Close modal on overlay click
-document.getElementById('modal-item').addEventListener('click', e => { if (e.target===e.currentTarget) closeItemModal(); });
-document.getElementById('modal-link').addEventListener('click', e => { if (e.target===e.currentTarget) closeLinkModal(); });
+document.getElementById('mc-cancel').addEventListener('click', closeCatModal);
+document.getElementById('mc-save').addEventListener('click', saveCat);
+document.getElementById('modal-cat').addEventListener('click', e => { if(e.target===e.currentTarget) closeCatModal(); });
 
-// Keyboard shortcuts
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeItemModal(); closeLinkModal(); }
+  if (e.key === 'Escape') { closeItemModal(); closeLinkModal(); closeCatModal(); closeSettings(); }
 });
-document.getElementById('fi-nome').addEventListener('keydown', e => { if (e.key==='Enter') saveItem(); });
-document.getElementById('fl-loja').addEventListener('keydown', e => { if (e.key==='Enter') saveLink(); });
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-handleRoute();
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+async function init() {
+  await loadSettings();
+  handleRoute();
+}
+init();
 </script>
 </body>
 </html>
